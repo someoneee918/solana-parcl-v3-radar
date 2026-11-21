@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solana Parcl v3 Real Estate Synthetics & Risk Radar</title>
+  <style>
+    :root {
+      --bg: #090b14;
+      --card-bg: rgba(18, 22, 38, 0.85);
+      --border: #232b4b;
+      --accent-sol: #14f195;
+      --accent-parcl: #06b6d4;
+      --text: #f0f4fc;
+      --text-muted: #8b97b0;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px; min-height: 100vh; }
+    .header { text-align: center; margin-bottom: 28px; }
+    .badge { display: inline-block; padding: 4px 12px; background: rgba(6,182,212,0.15); border: 1px solid var(--accent-parcl); border-radius: 12px; font-size: 12px; color: var(--accent-parcl); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #fff, var(--accent-parcl), var(--accent-sol)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p.subtitle { color: var(--text-muted); font-size: 14px; max-width: 800px; margin: 0 auto; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; backdrop-filter: blur(12px); }
+    .card h2 { font-size: 16px; margin-bottom: 14px; color: #fff; display: flex; align-items: center; justify-content: space-between; }
+    .card h2 span { font-size: 12px; color: var(--accent-sol); }
+    
+    .metric-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; }
+    .metric-row span.label { color: var(--text-muted); }
+    .metric-row span.val { font-weight: 600; font-family: monospace; }
+    .metric-row span.val.accent { color: var(--accent-sol); }
+    .metric-row span.val.parcl { color: var(--accent-parcl); }
+    .metric-row span.val.warn { color: var(--warn); }
+    .metric-row span.val.danger { color: var(--danger); }
+    
+    .progress-bar { width: 100%; height: 8px; background: #161c33; border-radius: 4px; overflow: hidden; margin: 8px 0 16px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-parcl), var(--accent-sol)); }
+    
+    .vip-box { border-top: 1px dashed var(--border); margin-top: 16px; padding-top: 14px; font-size: 12px; text-align: center; }
+    .vip-btn { display: inline-block; width: 100%; padding: 10px; background: linear-gradient(135deg, var(--accent-parcl), #0891b2); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; margin-top: 8px; }
+    .vip-btn:hover { opacity: 0.9; }
+    
+    .address-tag { font-family: monospace; background: #0c0e18; padding: 6px 10px; border-radius: 6px; border: 1px solid #1a2236; font-size: 11px; word-break: break-all; margin: 6px 0; text-align: left; }
+    
+    input[type=range] { width: 100%; margin: 8px 0; accent-color: var(--accent-parcl); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="badge">Solana Real Estate Synthetics Suite</div>
+    <h1>Solana Parcl v3 Real Estate Synthetics Radar</h1>
+    <p class="subtitle">City index open interest skew dynamics, single-LP pool delta exposure, and 10x leverage maintenance margin liquidation sentinels on Solana.</p>
+  </div>
+
+  <div class="grid">
+    <!-- Card 1: City Index Open Interest Skew Solver -->
+    <div class="card">
+      <h2>City Index Skew & Borrow APR <span>Live Solver</span></h2>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Simulate directional skew on NYC/Miami real estate synthetics and resultant borrow fees.</p>
+      
+      <label style="font-size:12px; color:var(--text-muted);">Long Open Interest: <b id="longOiVal" style="color:var(--accent-parcl);">$3.0M Longs</b></label>
+      <input type="range" id="longSlider" min="10" max="45" value="30" oninput="updateSkewModel()">
+
+      <div class="metric-row" style="margin-top:12px;">
+        <span class="label">Pool Liquidity (TVL):</span>
+        <span class="val">$5,000,000 USD</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Short Open Interest:</span>
+        <span class="val">$1,000,000 USD</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Net Skew Imbalance:</span>
+        <span class="val parcl" id="netSkew">+$2,000,000 USD</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Pool Utilization:</span>
+        <span class="val" id="utilVal">80.00%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="utilProgress" style="width: 80%;"></div>
+      </div>
+      <div class="metric-row">
+        <span class="label">Dynamic Long Borrow Rate:</span>
+        <span class="val warn" id="borrowRate">13.00% APR</span>
+      </div>
+    </div>
+
+    <!-- Card 2: 10x Leverage Liquidation Precision -->
+    <div class="card">
+      <h2>10x Real Estate Liquidation <span>MMR 5.0%</span></h2>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Quantifies exact price threshold before synthetic property exposure hits liquidation.</p>
+      
+      <div class="metric-row">
+        <span class="label">NYC City Index Entry:</span>
+        <span class="val parcl">$2,500.00 USD / sqft</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Position Leverage:</span>
+        <span class="val">10.0x Long (Max Cap)</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Maintenance Margin Req:</span>
+        <span class="val">5.00% MMR</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Exact Liquidation Price:</span>
+        <span class="val danger">$2,375.00 USD</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Adverse Price Shock Cushion:</span>
+        <span class="val danger">5.00% Drop Tolerance</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Liquidator Net Bounty ($20k):</span>
+        <span class="val accent">+$499.95 USD</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Single-LP Pool Delta Exposure -->
+    <div class="card">
+      <h2>Single-LP Tranche Yield & Delta <span>Passive Pool</span></h2>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">The LP pool counter-balances trader net skew while capturing trading fee volume.</p>
+      
+      <div class="metric-row">
+        <span class="label">LP Liquidity Pool:</span>
+        <span class="val">$10,000,000 USDC</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Daily Trading Volume:</span>
+        <span class="val parcl">$2,000,000 USD</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Trading Fee Tier:</span>
+        <span class="val">20.0 bps (0.20%)</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Annualized LP Fee APY:</span>
+        <span class="val accent">14.60% APY</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">LP Delta Counter-Exposure:</span>
+        <span class="val warn">-$1,500,000 USD (Short Bias)</span>
+      </div>
+      <div class="metric-row">
+        <span class="label">Daily Fee Cashflow:</span>
+        <span class="val accent">+$4,000.00 USD / Day</span>
+      </div>
+    </div>
+
+    <!-- Card 4: VIP Automated Sentinel -->
+    <div class="card">
+      <h2>Unlock VIP Parcl Sentinel <span>5 USDC / 0.03 SOL</span></h2>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Automated TypeScript `@parcl-oss/v3-sdk` real estate index position guardian, skew alerts, and Jito liquidation bot.</p>
+      
+      <div class="vip-box">
+        <p style="color:var(--text-muted); margin-bottom:4px;">Send payment to our non-custodial burner address:</p>
+        <div class="address-tag">Solana: DW2MdHEq3qZ6nh9b5YFUoaPnBuuxC8Gz2785kwbbjSAM</div>
+        <div class="address-tag">Base EVM: 0xF0E0D361bBE899F3089f0a968506eF2B97693c01</div>
+        <button class="vip-btn" onclick="alert('Send 5 Base USDC or 0.03 SOL to the receive address above. The on-chain daemon monitors RPCs and automatically grants VIP access.')">Unlock VIP Sentinel License</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateSkewModel() {
+      const sliderVal = parseInt(document.getElementById('longSlider').value);
+      const longOi = (sliderVal / 10.0) * 1000000;
+      const shortOi = 1000000;
+      const pool = 5000000;
+      
+      const netSkew = longOi - shortOi;
+      const util = ((longOi + shortOi) / pool) * 100;
+      const skewRatio = netSkew / pool;
+      const dynRate = Math.max(0, skewRatio * 0.20);
+      const longBorrowApr = (0.05 + (netSkew > 0 ? dynRate : 0)) * 100;
+
+      document.getElementById('longOiVal').innerText = '$' + (longOi / 1000000).toFixed(1) + 'M Longs';
+      document.getElementById('netSkew').innerText = (netSkew > 0 ? '+' : '') + '$' + (netSkew / 1000000).toFixed(2) + 'M USD';
+      document.getElementById('utilVal').innerText = util.toFixed(2) + '%';
+      document.getElementById('utilProgress').style.width = Math.min(100, util) + '%';
+      document.getElementById('borrowRate').innerText = longBorrowApr.toFixed(2) + '% APR';
+    }
+  </script>
+</body>
+</html>
